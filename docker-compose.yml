@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  ui-server:
+    image: pjtatlow/geney-ui:0.0.5
+    ports:
+      - 80:80
+      - 443:443
+  backend-server:
+    image: pjtatlow/geney-server:0.0.5
+    volumes:
+      - "./data:/root/data"
+    environment:
+      # see http://docs.gunicorn.org/en/latest/settings.html#settings for details
+      - GUNICORN_CMD_ARGS=--workers=4 --bind=:8888 --worker-class=eventlet --worker-connections 100
+      - GENEY_DATA_PATH=/root/data
+      - GENEY_URL=http://YOUR_URL_HERE
+  redis:
+    image: redis:4-alpine
+    volumes:
+      - ./redis:/redis
+    entrypoint:
+      - redis-server
+      - /redis/redis.conf
